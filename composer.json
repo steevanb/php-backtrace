@@ -4,7 +4,7 @@
     "type": "library",
     "description": "Nice debug_backtrace() dump, with call and code preview",
     "autoload": {
-        "psr-4": { "": "" }
+        "files": ["DumpBacktrace.php"]
     },
     "require": {
       "php": "^5.4|^7.0"

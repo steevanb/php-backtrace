@@ -19,7 +19,7 @@ class DumpBacktrace
      */
     public static function dump($offset = 0, $limit = null)
     {
-        static::dumpBacktraces(static::getBacktraces($offset + 1, $limit));
+        echo static::getBacktracesDump(static::getBacktraces($offset + 1, $limit));
     }
 
     /**
@@ -35,7 +35,7 @@ class DumpBacktrace
 
         $filteredBacktraces = [];
         foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, $limit) as $dumpIndex => $backtrace) {
-            if ($dumpIndex >= $offset) {
+            if ($dumpIndex > $offset) {
                 $filteredBacktrace = [
                     'file' => isset($backtrace['file']) ? $backtrace['file'] : null,
                     'line' => isset($backtrace['line']) ? $backtrace['line'] : null,
@@ -55,11 +55,11 @@ class DumpBacktrace
     }
 
     /**
-     * @param array $backtraces
      * @return array|null
      */
-    protected static function getCaller(array $backtraces)
+    protected static function getCaller()
     {
+        $backtraces = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 7);
         $nextIsCaller = false;
         $caller = null;
         foreach ($backtraces as $backtrace) {
@@ -70,8 +70,10 @@ class DumpBacktrace
                 $nextIsCaller = true;
             } elseif (
                 $nextIsCaller
-                && isset($backtrace['file'])
-                && strpos($backtrace['file'], __FILE__) === false
+                && (
+                    (isset($backtrace['file']) && strpos($backtrace['file'], __FILE__) === false)
+                    || isset($backtrace['file']) === false
+                )
             ) {
                 $caller = $backtrace;
                 break;
@@ -86,92 +88,139 @@ class DumpBacktrace
 
     /**
      * @param array $backtraces
+     * @return string
      */
-    protected static function dumpBacktraces(array $backtraces)
+    protected static function getBacktracesDump(array $backtraces)
     {
-        echo '
-            <style>
-                table.table-backtrace tr.dark {
+        $return = static::getStylesDump();
+        $return .= static::getJavascriptDump();
+
+        $return .= '<div class="steevanb-backtrace-container">';
+        $return .= static::getCallerDump();
+
+        $return .= '
+            <table class="table-backtrace">
+                <tr>
+                    <th>#</th>
+                    <th>File::Line</th>
+                    <th>Call</th>
+                </tr>
+        ';
+        $previewPrefix = uniqid('steevanb_backtrace_preview');
+        foreach ($backtraces as $index => $backtrace) {
+            $return .= static::getBacktraceDump($backtrace, $index, $previewPrefix);
+        }
+        $return .= '</table>';
+
+        $return .= '</div>';
+
+        return $return;
+    }
+
+    /**
+     * @return string
+     */
+    protected static function getStylesDump()
+    {
+        return '
+            <style type="text/css">
+                .steevanb-backtrace-container {
+                    padding: 5px;
+                    border: solid 2px #9e9e9e;
+                    background-color: #F5F5F5;
+                    cursor: default;
+                    font-family: monospace;
+                }
+                .steevanb-backtrace-container table {
+                    border-collapse: collapse;
+                }
+                .steevanb-backtrace-container table.table-backtrace tr.dark {
                     background-color: #e5e5e5;
                 }
-                table.table-backtrace td {
+                .steevanb-backtrace-container table.table-backtrace td {
                     padding: 2px !important;
                 }
-                table.table-backtrace td a,
-                table.table-backtrace td a:hover,
-                table.table-backtrace td a:visited
+                .steevanb-backtrace-container table.table-backtrace td a,
+                .steevanb-backtrace-container table.table-backtrace td a:hover,
+                .steevanb-backtrace-container table.table-backtrace td a:visited
                 {
                     color: #4e7ca9 !important;
                     text-decoration: none !important;
                     cursor: pointer !important;
                 }
-                table.table-backtrace td a:hover {
+                .steevanb-backtrace-container table.table-backtrace td a:hover {
                     text-decoration: underline !important;
                 }
-            </style>
+            </style>';
+    }
+
+    /**
+     * @return string
+     */
+    protected static function getJavascriptDump()
+    {
+        return '
             <script type="text/javascript">
                 function steevanb_dev_showCodePreview(id)
                 {
                     var element = document.getElementById(id);
                     element.style.display = (element.style.display === "none") ? "" : "none";
                 }
-            </script>
-        ';
-        echo '<div style="padding: 5px; border: solid 2px #9e9e9e; background-color: #F5F5F5">';
-        static::dumpCaller($backtraces);
-        echo '
-            <table class="table-backtrace">
-                <tr>
-                    <th>#</th>
-                    <th>File</th>
-                    <th>Call</th>
-                </tr>
-        ';
-        $previewPrefix = uniqid('steevanb_backtrace_preview');
-        foreach ($backtraces as $index => $backtrace) {
-            if (isset($backtrace['file'])) {
-                $file = basename($backtrace['file']);
-                $filePath = $backtrace['file'];
-                $fileFound = true;
-            } else {
-                $file = '(Unknow file)';
-                $filePath = null;
-                $fileFound = false;
-            }
-
-            if (isset($backtrace['line'])) {
-                $line = $backtrace['line'];
-                $lineFound = true;
-            } else {
-                $line = '(Unknow line)';
-                $lineFound = false;
-            }
-
-            $codePreview = ($fileFound && $lineFound) ? static::getCodePreview($filePath, $line) : 'No preview available';
-            $previewId = $previewPrefix . '_' . $index;
-            echo '
-                <tr' . ($index % 2 ? ' class="dark"' : null) . '>
-                    <td>' . $index . '</td>
-                    <td><a title="' . static::getFilePath($filePath) . '" onclick="steevanb_dev_showCodePreview(\'' . $previewId . '\')">' . $file . '::' . $line . '</a></td>
-                    <td>' . $backtrace['call'] . '</td>
-                </tr>
-                <tr' . ($index % 2 ? ' class="dark"' : null) . ' id="' . $previewId . '" style="display: none">
-                    <td colspan="3">' . $codePreview . '</td>
-                </tr>
-            ';
-        }
-        echo '</table>';
-        echo '</div>';
+            </script>';
     }
 
     /**
-     * @param array $backtraces
+     * @param array $backtrace
+     * @param int $index
+     * @param string $previewPrefix
+     * @return string
      */
-    protected static function dumpCaller(array $backtraces)
+    protected static function getBacktraceDump(array $backtrace, $index, $previewPrefix)
     {
-        $caller = static::getCaller($backtraces);
+        if (isset($backtrace['file'])) {
+            $file = basename($backtrace['file']);
+            $filePath = $backtrace['file'];
+            $fileFound = true;
+        } else {
+            $file = '(Unknow file)';
+            $filePath = null;
+            $fileFound = false;
+        }
 
-        echo '<div style="padding: 5px; background-color: #78a1c9; color: white; font-weight: bold">';
+        if (isset($backtrace['line'])) {
+            $line = $backtrace['line'];
+            $lineFound = true;
+        } else {
+            $line = '(Unknow line)';
+            $lineFound = false;
+        }
+
+        $codePreview = ($fileFound && $lineFound) ? static::getCodePreview($filePath, $line) : 'No preview available';
+        $previewId = $previewPrefix . '_' . $index;
+
+        return '
+                <tr' . ($index % 2 ? null : ' class="dark"') . '>
+                    <td>' . $index . '</td>
+                    <td>
+                        <a title="' . static::getFilePath($filePath) . '" onclick="steevanb_dev_showCodePreview(\'' . $previewId . '\')">
+                            ' . $file . '::' . $line . '
+                        </a>
+                    </td>
+                    <td>' . $backtrace['call'] . '</td>
+                </tr>
+                <tr' . ($index % 2 ? null : ' class="dark"') . ' id="' . $previewId . '" style="display: none">
+                    <td colspan="3"><pre>' . $codePreview . '</pre></td>
+                </tr>';
+    }
+
+    /**
+     * @return string
+     */
+    protected static function getCallerDump()
+    {
+        $caller = static::getCaller();
+
+        $return = '<div style="padding: 5px; background-color: #78a1c9; color: white; font-weight: bold">';
         $header = null;
         if (is_array($caller)) {
             $header .= isset($caller['file']) ? static::getFilePath($caller['file']) : '(Unknow file)';
@@ -179,8 +228,10 @@ class DumpBacktrace
         } else {
             $header= 'Unkonw caller';
         }
-        echo $header;
-        echo '</div>';
+        $return .= $header;
+        $return .= '</div>';
+
+        return $return;
     }
 
     /**
