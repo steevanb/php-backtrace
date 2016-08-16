@@ -43,6 +43,8 @@ class DumpBacktrace
                 if (isset($backtrace['class'])) {
                     $filteredBacktrace['call'] =
                         $backtrace['class'] . $backtrace['type'] . $backtrace['function'] . '()';
+                } elseif (isset($backtrace['function'])) {
+                    $filteredBacktrace['call'] = $backtrace['function'] . '()';
                 } else {
                     $filteredBacktrace['call'] = '(Unknow call)';
                 }
@@ -182,7 +184,6 @@ class DumpBacktrace
             $filePath = $backtrace['file'];
             $fileFound = true;
         } else {
-            $file = '(Unknow file)';
             $filePath = null;
             $fileFound = false;
         }
@@ -191,26 +192,40 @@ class DumpBacktrace
             $line = $backtrace['line'];
             $lineFound = true;
         } else {
-            $line = '(Unknow line)';
             $lineFound = false;
         }
 
-        $codePreview = ($fileFound && $lineFound) ? static::getCodePreview($filePath, $line) : 'No preview available';
-        $previewId = $previewPrefix . '_' . $index;
+        if ($fileFound === false && $lineFound === false) {
+            $fileLineHtml = '\Closure';
+        } else {
+            $previewId = $previewPrefix . '_' . $index;
+            $codePreview = static::getCodePreview($filePath, $line);
+            $fileLineHtml = '
+                <a
+                    title="' . static::getFilePath($filePath) . '"
+                    onclick="steevanb_dev_showCodePreview(\'' . $previewId . '\')"
+                >
+                    ' . $file . '::' . $line . '
+                </a>
+            ';
+        }
 
-        return '
-                <tr' . ($index % 2 ? null : ' class="dark"') . '>
-                    <td>' . $index . '</td>
-                    <td>
-                        <a title="' . static::getFilePath($filePath) . '" onclick="steevanb_dev_showCodePreview(\'' . $previewId . '\')">
-                            ' . $file . '::' . $line . '
-                        </a>
-                    </td>
-                    <td>' . $backtrace['call'] . '</td>
-                </tr>
+        $html = '
+            <tr' . ($index % 2 ? null : ' class="dark"') . '>
+                <td>' . $index . '</td>
+                <td>' . $fileLineHtml . '</td>
+                <td>' . $backtrace['call'] . '</td>
+            </tr>
+        ';
+        if ($fileFound && $lineFound) {
+            $html .= '
                 <tr' . ($index % 2 ? null : ' class="dark"') . ' id="' . $previewId . '" style="display: none">
                     <td colspan="3"><pre>' . $codePreview . '</pre></td>
-                </tr>';
+                </tr>
+            ';
+        }
+
+        return $html;
     }
 
     /**
@@ -283,7 +298,9 @@ class DumpBacktrace
             $return = $path;
         } else {
             // assume that we are in vendor/ dir
-            $prefix = (static::$removePathPrefix === true) ? realpath(__DIR__ . '/../../../../../') : static::$removePathPrefix;
+            $prefix = (static::$removePathPrefix === true)
+                ? realpath(__DIR__ . '/../../../')
+                : static::$removePathPrefix;
             $return = (substr($path, 0, strlen($prefix)) === $prefix) ? substr($path, strlen($prefix) + 1) : $path;
         }
 
