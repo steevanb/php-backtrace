@@ -19,7 +19,17 @@ class DumpBacktrace
      */
     public static function dump($offset = 0, $limit = null)
     {
-        echo static::getBacktracesDump(static::getBacktraces($offset + 1, $limit));
+        echo static::getDump(static::getBacktraces($offset + 1, $limit));
+    }
+
+    /**
+     * @param int $offset
+     * @param int|null $limit
+     */
+    public static function eDump($offset = 0, $limit = null)
+    {
+        static::dump($offset + 1, $limit);
+        exit();
     }
 
     /**
@@ -57,6 +67,37 @@ class DumpBacktrace
     }
 
     /**
+     * @param array $backtraces
+     * @return string
+     */
+    public static function getDump(array $backtraces)
+    {
+        $return = static::getStylesDump();
+        $return .= static::getJavascriptDump();
+
+        $return .= '<div class="steevanb-backtrace-container">';
+        $return .= static::getCallerDump();
+
+        $return .= '
+            <table class="table-backtrace">
+                <tr>
+                    <th>#</th>
+                    <th>File::Line</th>
+                    <th>Call</th>
+                </tr>
+        ';
+        $previewPrefix = uniqid('steevanb_backtrace_preview');
+        foreach ($backtraces as $index => $backtrace) {
+            $return .= static::getBacktraceDump($backtrace, $index, $previewPrefix);
+        }
+        $return .= '</table>';
+
+        $return .= '</div>';
+
+        return $return;
+    }
+
+    /**
      * @return array|null
      */
     protected static function getCaller()
@@ -86,37 +127,6 @@ class DumpBacktrace
         }
 
         return $caller;
-    }
-
-    /**
-     * @param array $backtraces
-     * @return string
-     */
-    protected static function getBacktracesDump(array $backtraces)
-    {
-        $return = static::getStylesDump();
-        $return .= static::getJavascriptDump();
-
-        $return .= '<div class="steevanb-backtrace-container">';
-        $return .= static::getCallerDump();
-
-        $return .= '
-            <table class="table-backtrace">
-                <tr>
-                    <th>#</th>
-                    <th>File::Line</th>
-                    <th>Call</th>
-                </tr>
-        ';
-        $previewPrefix = uniqid('steevanb_backtrace_preview');
-        foreach ($backtraces as $index => $backtrace) {
-            $return .= static::getBacktraceDump($backtrace, $index, $previewPrefix);
-        }
-        $return .= '</table>';
-
-        $return .= '</div>';
-
-        return $return;
     }
 
     /**
