@@ -189,33 +189,52 @@ class DumpBacktrace
      */
     protected static function getBacktraceDump(array $backtrace, $index, $previewPrefix)
     {
-        if (isset($backtrace['file'])) {
-            $file = basename($backtrace['file']);
-            $filePath = $backtrace['file'];
-            $fileFound = true;
-        } else {
-            $filePath = null;
-            $fileFound = false;
-        }
+        $filePath = null;
+        $line = null;
+        $previewId = $previewPrefix . '_' . $index;
 
-        if (isset($backtrace['line'])) {
-            $line = $backtrace['line'];
-            $lineFound = true;
+        if (isset($backtrace['file'])) {
+            if (file_exists($backtrace['file'])) {
+                $filePath = $backtrace['file'];
+                $fileFound = true;
+
+                if (isset($backtrace['line'])) {
+                    $line = $backtrace['line'];
+                    $lineFound = true;
+                } else {
+                    $lineFound = false;
+                }
+            } elseif (substr($backtrace['file'], -16) === ' : eval()\'d code') {
+                $fileAndLine = substr($backtrace['file'], 0, -16);
+                $filePath = substr($fileAndLine, 0, strrpos($fileAndLine, '('));
+                if (file_exists($filePath)) {
+                    $line = substr($fileAndLine, strrpos($fileAndLine, '(') + 1, -1);
+                    $fileFound = true;
+                    $lineFound = true;
+                } else {
+                    $fileFound = false;
+                    $lineFound = false;
+                }
+            } else {
+                $fileFound = false;
+                $lineFound = false;
+            }
         } else {
+            $fileFound = false;
             $lineFound = false;
         }
 
         if ($fileFound === false && $lineFound === false) {
             $fileLineHtml = '\Closure';
+            $codePreview = null;
         } else {
-            $previewId = $previewPrefix . '_' . $index;
             $codePreview = static::getCodePreview($filePath, $line);
             $fileLineHtml = '
                 <a
                     title="' . static::getFilePath($filePath) . '"
                     onclick="steevanb_dev_showCodePreview(\'' . $previewId . '\')"
                 >
-                    ' . $file . '::' . $line . '
+                    ' . basename($filePath) . '::' . $line . '
                 </a>
             ';
         }
