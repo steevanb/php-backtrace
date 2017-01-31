@@ -1,18 +1,7 @@
 <?php
 
-class DumpBacktrace
+class DebugBacktraceHtml extends \DebugBacktrace
 {
-    /** @var bool|string */
-    protected static $removePathPrefix = true;
-
-    /**
-     * @param bool|string $remove
-     */
-    public static function setRemovePathPrefix($remove)
-    {
-        static::$removePathPrefix = $remove;
-    }
-
     /**
      * @param int $offset
      * @param int|null $limit
@@ -33,47 +22,13 @@ class DumpBacktrace
     }
 
     /**
-     * @param int $offset
-     * @param int|null $limit
-     * @return array
-     */
-    public static function getBacktraces($offset = 0, $limit = null)
-    {
-        if ($limit !== null) {
-            $limit += $offset;
-        }
-
-        $filteredBacktraces = [];
-        foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, $limit) as $dumpIndex => $backtrace) {
-            if ($dumpIndex > $offset) {
-                $filteredBacktrace = [
-                    'file' => isset($backtrace['file']) ? $backtrace['file'] : null,
-                    'line' => isset($backtrace['line']) ? $backtrace['line'] : null,
-                ];
-                if (isset($backtrace['class'])) {
-                    $filteredBacktrace['call'] =
-                        $backtrace['class'] . $backtrace['type'] . $backtrace['function'] . '()';
-                } elseif (isset($backtrace['function'])) {
-                    $filteredBacktrace['call'] = $backtrace['function'] . '()';
-                } else {
-                    $filteredBacktrace['call'] = '(Unknow call)';
-                }
-
-                $filteredBacktraces[] = $filteredBacktrace;
-            }
-        }
-
-        return $filteredBacktraces;
-    }
-
-    /**
      * @param array $backtraces
      * @return string
      */
     public static function getDump(array $backtraces)
     {
-        $return = static::getStylesDump();
-        $return .= static::getJavascriptDump();
+        $return = static::getStyles();
+        $return .= static::getJavascript();
 
         $return .= '<div class="steevanb-backtrace-container">';
         $return .= static::getCallerDump();
@@ -82,7 +37,7 @@ class DumpBacktrace
             <table class="table-backtrace">
                 <tr>
                     <th>#</th>
-                    <th>File::Line</th>
+                    <th>File#Line</th>
                     <th>Call</th>
                 </tr>
         ';
@@ -97,47 +52,13 @@ class DumpBacktrace
         return $return;
     }
 
-    /**
-     * @return array|null
-     */
-    protected static function getCaller()
-    {
-        $backtraces = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 7);
-        $nextIsCaller = false;
-        $caller = null;
-        foreach ($backtraces as $backtrace) {
-            if (
-                isset($backtrace['file'])
-                && strpos($backtrace['file'], __FILE__) !== false
-            ) {
-                $nextIsCaller = true;
-            } elseif (
-                $nextIsCaller
-                && (
-                    (isset($backtrace['file']) && strpos($backtrace['file'], __FILE__) === false)
-                    || isset($backtrace['file']) === false
-                )
-            ) {
-                $caller = $backtrace;
-                break;
-            }
-        }
-        if ($nextIsCaller === false && count($backtraces) > 0) {
-            $caller = $backtraces[0];
-        }
-
-        return $caller;
-    }
-
-    /**
-     * @return string
-     */
-    protected static function getStylesDump()
+    /** @return string */
+    protected static function getStyles()
     {
         return '
             <style type="text/css">
                 .steevanb-backtrace-container {
-                    padding: 5px;
+                    padding: 3px;
                     border: solid 2px #9e9e9e;
                     background-color: #F5F5F5;
                     cursor: default;
@@ -163,13 +84,17 @@ class DumpBacktrace
                 .steevanb-backtrace-container table.table-backtrace td a:hover {
                     text-decoration: underline !important;
                 }
+                .steevanb-backtrace-caller {
+                    padding: 3px;
+                    background-color: #78a1c9;
+                    color: white;
+                    font-weight: bold;
+                }
             </style>';
     }
 
-    /**
-     * @return string
-     */
-    protected static function getJavascriptDump()
+    /** @return string */
+    protected static function getJavascript()
     {
         return '
             <script type="text/javascript">
@@ -193,12 +118,12 @@ class DumpBacktrace
         $line = null;
         $previewId = $previewPrefix . '_' . $index;
 
-        if (isset($backtrace['file'])) {
+        if ($backtrace['file'] !== null) {
             if (file_exists($backtrace['file'])) {
                 $filePath = $backtrace['file'];
                 $fileFound = true;
 
-                if (isset($backtrace['line'])) {
+                if ($backtrace['line'] !== null) {
                     $line = $backtrace['line'];
                     $lineFound = true;
                 } else {
@@ -234,14 +159,14 @@ class DumpBacktrace
                     title="' . static::getFilePath($filePath) . '"
                     onclick="steevanb_dev_showCodePreview(\'' . $previewId . '\')"
                 >
-                    ' . basename($filePath) . '::' . $line . '
+                    ' . basename($filePath) . '#' . $line . '
                 </a>
             ';
         }
 
         $html = '
             <tr' . ($index % 2 ? null : ' class="dark"') . '>
-                <td>' . $index . '</td>
+                <td>' . ($index + 1) . '</td>
                 <td>' . $fileLineHtml . '</td>
                 <td>' . $backtrace['call'] . '</td>
             </tr>
@@ -257,18 +182,16 @@ class DumpBacktrace
         return $html;
     }
 
-    /**
-     * @return string
-     */
+    /** @return string */
     protected static function getCallerDump()
     {
         $caller = static::getCaller();
 
-        $return = '<div style="padding: 5px; background-color: #78a1c9; color: white; font-weight: bold">';
+        $return = '<div class="steevanb-backtrace-caller">';
         $header = null;
         if (is_array($caller)) {
             $header .= isset($caller['file']) ? static::getFilePath($caller['file']) : '(Unknow file)';
-            $header .= isset($caller['line']) ? '::' . $caller['line'] : '::(Unknow line)';
+            $header .= isset($caller['line']) ? '#' . $caller['line'] : '::(Unknow line)';
         } else {
             $header= 'Unkonw caller';
         }
@@ -276,18 +199,6 @@ class DumpBacktrace
         $return .= '</div>';
 
         return $return;
-    }
-
-    /**
-     * @param string $code
-     * @return string
-     */
-    protected static function highlightCode($code)
-    {
-        $highlight = highlight_string('<?php ' . $code, true);
-        $highlight = str_replace('>&lt;?php&nbsp;', null, $highlight);
-
-        return $highlight;
     }
 
     /**
@@ -313,26 +224,5 @@ class DumpBacktrace
         }
 
         return implode('<br />', $preview);
-    }
-
-    /**
-     * @param string $path
-     * @return string
-     */
-    protected static function getFilePath($path)
-    {
-        $path = realpath($path);
-
-        if (static::$removePathPrefix === false) {
-            $return = $path;
-        } else {
-            // assume that we are in vendor/ dir
-            $prefix = (static::$removePathPrefix === true)
-                ? realpath(__DIR__ . '/../../../')
-                : static::$removePathPrefix;
-            $return = (substr($path, 0, strlen($prefix)) === $prefix) ? substr($path, strlen($prefix) + 1) : $path;
-        }
-
-        return $return;
     }
 }

@@ -1,3 +1,10 @@
+2.0.0 (2016-12-31)
+------------------
+
+- Reverse backtraces : first shown is first call (debug_backtrace() show last call in first)
+- Split \DumpBacktrace in 3 classes : \DebugBacktrace, \DebugBacktraceHtml and \DebugBacktraceConsole
+- Add dump for symfony/console applications
+
 1.1.1 (2016-10-12)
 ------------------
 
@@ -21,4 +28,3 @@
 ------------------
 
 - Create \DumpBacktrace class
-
