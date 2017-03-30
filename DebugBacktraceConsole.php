@@ -5,6 +5,9 @@ use \Symfony\Component\Console\Helper\Table;
 
 class DebugBacktraceConsole extends \DebugBacktrace
 {
+    /** @var ?string */
+    protected static $callerRemoveFile = __FILE__;
+    
     /**
      * @param OutputInterface $output
      * @param int $offset

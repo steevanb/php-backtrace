@@ -5,6 +5,9 @@ class DebugBacktrace
     /** @var bool|string */
     protected static $removePathPrefix = true;
 
+    /** @var ?string */
+    protected static $callerRemoveFile = __FILE__;
+
     /** @param bool|string $remove */
     public static function setRemovePathPrefix($remove)
     {
@@ -48,19 +51,19 @@ class DebugBacktrace
     /** @return array|null */
     public static function getCaller()
     {
-        $backtraces = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 7);
+        $backtraces = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10);
         $nextIsCaller = false;
         $caller = null;
         foreach ($backtraces as $backtrace) {
             if (
                 isset($backtrace['file'])
-                && strpos($backtrace['file'], __FILE__) !== false
+                && strpos($backtrace['file'], static::$callerRemoveFile) !== false
             ) {
                 $nextIsCaller = true;
             } elseif (
                 $nextIsCaller
                 && (
-                    (isset($backtrace['file']) && strpos($backtrace['file'], __FILE__) === false)
+                    (isset($backtrace['file']) && strpos($backtrace['file'], static::$callerRemoveFile) === false)
                     || isset($backtrace['file']) === false
                 )
             ) {

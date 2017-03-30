@@ -2,6 +2,9 @@
 
 class DebugBacktraceHtml extends \DebugBacktrace
 {
+    /** @var ?string */
+    protected static $callerRemoveFile = __FILE__;
+
     /**
      * @param int $offset
      * @param int|null $limit
