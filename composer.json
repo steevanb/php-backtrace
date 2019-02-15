@@ -1,5 +1,5 @@
 {
-    "name": "steevanb/php-backtrace",
+    "name": "wizaplace/php-backtrace",
     "license": "MIT",
     "type": "library",
     "description": "Nice debug_backtrace() dump, with call and code preview",
@@ -8,11 +8,5 @@
     },
     "require": {
       "php": "^5.4|^7.0"
-    },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/steevanb/php-backtrace.git"
-        }
-    ]
+    }
 }

@@ -33,7 +33,7 @@ class DebugBacktraceHtml extends \DebugBacktrace
         $return = static::getStyles();
         $return .= static::getJavascript();
 
-        $return .= '<div class="steevanb-backtrace-container">';
+        $return .= '<div class="wizaplace-backtrace-container">';
         $return .= static::getCallerDump();
 
         $return .= '
@@ -44,7 +44,7 @@ class DebugBacktraceHtml extends \DebugBacktrace
                     <th>Call</th>
                 </tr>
         ';
-        $previewPrefix = uniqid('steevanb_backtrace_preview');
+        $previewPrefix = uniqid('wizaplace_backtrace_preview');
         foreach ($backtraces as $index => $backtrace) {
             $return .= static::getBacktraceDump($backtrace, $index, $previewPrefix);
         }
@@ -60,34 +60,34 @@ class DebugBacktraceHtml extends \DebugBacktrace
     {
         return '
             <style type="text/css">
-                .steevanb-backtrace-container {
+                .wizaplace-backtrace-container {
                     padding: 3px;
                     border: solid 2px #9e9e9e;
                     background-color: #F5F5F5;
                     cursor: default;
                     font-family: monospace;
                 }
-                .steevanb-backtrace-container table {
+                .wizaplace-backtrace-container table {
                     border-collapse: collapse;
                 }
-                .steevanb-backtrace-container table.table-backtrace tr.dark {
+                .wizaplace-backtrace-container table.table-backtrace tr.dark {
                     background-color: #e5e5e5;
                 }
-                .steevanb-backtrace-container table.table-backtrace td {
+                .wizaplace-backtrace-container table.table-backtrace td {
                     padding: 2px !important;
                 }
-                .steevanb-backtrace-container table.table-backtrace td a,
-                .steevanb-backtrace-container table.table-backtrace td a:hover,
-                .steevanb-backtrace-container table.table-backtrace td a:visited
+                .wizaplace-backtrace-container table.table-backtrace td a,
+                .wizaplace-backtrace-container table.table-backtrace td a:hover,
+                .wizaplace-backtrace-container table.table-backtrace td a:visited
                 {
                     color: #4e7ca9 !important;
                     text-decoration: none !important;
                     cursor: pointer !important;
                 }
-                .steevanb-backtrace-container table.table-backtrace td a:hover {
+                .wizaplace-backtrace-container table.table-backtrace td a:hover {
                     text-decoration: underline !important;
                 }
-                .steevanb-backtrace-caller {
+                .wizaplace-backtrace-caller {
                     padding: 3px;
                     background-color: #78a1c9;
                     color: white;
@@ -101,7 +101,7 @@ class DebugBacktraceHtml extends \DebugBacktrace
     {
         return '
             <script type="text/javascript">
-                function steevanb_dev_showCodePreview(id)
+                function wizaplace_dev_showCodePreview(id)
                 {
                     var element = document.getElementById(id);
                     element.style.display = (element.style.display === "none") ? "" : "none";
@@ -160,7 +160,7 @@ class DebugBacktraceHtml extends \DebugBacktrace
             $fileLineHtml = '
                 <a
                     title="' . static::getFilePath($filePath) . '"
-                    onclick="steevanb_dev_showCodePreview(\'' . $previewId . '\')"
+                    onclick="wizaplace_dev_showCodePreview(\'' . $previewId . '\')"
                 >
                     ' . basename($filePath) . '#' . $line . '
                 </a>
@@ -190,7 +190,7 @@ class DebugBacktraceHtml extends \DebugBacktrace
     {
         $caller = static::getCaller();
 
-        $return = '<div class="steevanb-backtrace-caller">';
+        $return = '<div class="wizaplace-backtrace-caller">';
         $header = null;
         if (is_array($caller)) {
             $header .= isset($caller['file']) ? static::getFilePath($caller['file']) : '(Unknow file)';
