@@ -1,3 +1,7 @@
+### [2.1.0](../../compare/2.0.1...2.1.0) (2020-05-15)
+
+- Set `DebugBacktraceConsole::dump()` and `DebugBacktraceConsole::eDump()` `$output` parameter facultative
+
 ### [2.0.1](../../compare/2.0.0...2.0.1) (2017-03-30)
 
 - Fix caller for \DebugBacktraceHtml and \DebugBacktraceConsole

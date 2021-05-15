@@ -1,20 +1,23 @@
 <?php
 
-use \Symfony\Component\Console\Output\OutputInterface;
-use \Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Helper\Table;
 
 class DebugBacktraceConsole extends \DebugBacktrace
 {
     /** @var ?string */
     protected static $callerRemoveFile = __FILE__;
-    
+
     /**
      * @param OutputInterface $output
      * @param int $offset
      * @param int|null $limit
      */
-    public static function dump(OutputInterface $output, $offset = 0, $limit = null)
+    public static function dump(OutputInterface $output = null, $offset = 0, $limit = null)
     {
+        $output = static::getOutput($output);
+
         static::writeCaller($output);
 
         $table = new Table($output);
@@ -30,7 +33,7 @@ class DebugBacktraceConsole extends \DebugBacktrace
      * @param int $offset
      * @param int|null $limit
      */
-    public static function eDump(OutputInterface $output, $offset = 0, $limit = null)
+    public static function eDump(OutputInterface $output = null, $offset = 0, $limit = null)
     {
         static::dump($output, $offset + 1, $limit);
         exit();
@@ -65,5 +68,11 @@ class DebugBacktraceConsole extends \DebugBacktrace
         } else {
             $output->writeln('<error>Unkonw caller</error>');
         }
+    }
+
+    /** @eturn OutputInterface */
+    protected static function getOutput(OutputInterface $output)
+    {
+        return $output instanceof OutputInterface ? $output : new ConsoleOutput();
     }
 }
