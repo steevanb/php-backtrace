@@ -7,12 +7,6 @@
         "files": ["DebugBacktrace.php", "DebugBacktraceHtml.php", "DebugBacktraceConsole.php"]
     },
     "require": {
-      "php": "^5.4|^7.0"
-    },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/steevanb/php-backtrace.git"
-        }
-    ]
+      "php": "^5.4|^7.0|^8.0"
+    }
 }
