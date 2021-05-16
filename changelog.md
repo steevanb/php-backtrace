@@ -2,7 +2,7 @@
 
 - Set `DebugBacktraceConsole::dump()` and `DebugBacktraceConsole::eDump()` `$output` parameter facultative
 - Add PHP 8 compatibility
-- Add PHPUnit tests for PHP `5.4` to `8.0
+- Add PHPUnit tests for PHP `5.4` to `8.0`
 - Move files from `/` to `/src` (it's not a BC break because you must use this classes with autoload)
 
 ### [2.0.1](../../compare/2.0.0...2.0.1) (2017-03-30)
