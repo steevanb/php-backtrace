@@ -7,7 +7,7 @@ source "${rootDir}/bin/common.inc.sh"
 
 function buildDockerImage() {
     local localPhpVersion="${1}"
-    local localDockerImageName="steevanb/php-typed-array-ci-php${localPhpVersion}:latest"
+    local localDockerImageName="steevanb/php-backtrace-ci:php${localPhpVersion}"
     if [ ${refresh} == true ]; then
         local localRefreshArguments="--no-cache"
     else
@@ -21,12 +21,20 @@ function buildDockerImage() {
                 "${rootDir}/docker/php${localPhpVersion}" \
                 ${localRefreshArguments} \
                 --tag "${localDockerImageName}"
+
+    if [ ${push} == true ]; then
+        title "Push Docker image ${localDockerImageName}"
+        docker push "${localDockerImageName}"
+    fi
 }
 
 refresh=false
+push=false
 for param in "$@"; do
     if [ "${param}" == "--refresh" ]; then
         refresh=true
+    elif [ "${param}" == "--push" ]; then
+        push=true
     fi
 done
 

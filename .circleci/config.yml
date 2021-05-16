@@ -1,0 +1,107 @@
+version: '2.1'
+
+jobs:
+    phpunitPhp54:
+        docker:
+            -
+                image: steevanb/php-backtrace-ci:php54
+        working_directory: /app
+        steps:
+            - checkout
+            -
+                run:
+                    name: phpunit
+                    command: bin/ci/phpunitPhp54
+
+    phpunitPhp55:
+        docker:
+            - image: steevanb/php-backtrace-ci:php55
+        working_directory: /app
+        steps:
+            - checkout
+            - run:
+                  name: phpunit
+                  command: bin/ci/phpunitPhp55
+
+    phpunitPhp56:
+        docker:
+            - image: steevanb/php-backtrace-ci:php56
+        working_directory: /app
+        steps:
+            - checkout
+            - run:
+                  name: phpunit
+                  command: bin/ci/phpunitPhp56
+
+    phpunitPhp70:
+        docker:
+            - image: steevanb/php-backtrace-ci:php70
+        working_directory: /app
+        steps:
+            - checkout
+            - run:
+                  name: phpunit
+                  command: bin/ci/phpunitPhp70
+
+    phpunitPhp71:
+        docker:
+            - image: steevanb/php-backtrace-ci:php71
+        working_directory: /app
+        steps:
+            - checkout
+            - run:
+                  name: phpunit
+                  command: bin/ci/phpunitPhp71
+
+    phpunitPhp72:
+        docker:
+            - image: steevanb/php-backtrace-ci:php72
+        working_directory: /app
+        steps:
+            - checkout
+            - run:
+                  name: phpunit
+                  command: bin/ci/phpunitPhp72
+
+    phpunitPhp73:
+        docker:
+            - image: steevanb/php-backtrace-ci:php73
+        working_directory: /app
+        steps:
+            - checkout
+            - run:
+                  name: phpunit
+                  command: bin/ci/phpunitPhp73
+
+    phpunitPhp74:
+        docker:
+            - image: steevanb/php-backtrace-ci:php74
+        working_directory: /app
+        steps:
+            - checkout
+            - run:
+                  name: phpunit
+                  command: bin/ci/phpunitPhp74
+
+    phpunitPhp80:
+        docker:
+            - image: steevanb/php-backtrace-ci:php80
+        working_directory: /app
+        steps:
+            - checkout
+            - run:
+                  name: phpunit
+                  command: bin/ci/phpunitPhp80
+
+workflows:
+    CI:
+        jobs:
+            - phpunitPhp54
+            - phpunitPhp55
+            - phpunitPhp56
+            - phpunitPhp70
+            - phpunitPhp71
+            - phpunitPhp72
+            - phpunitPhp73
+            - phpunitPhp74
+            - phpunitPhp80

@@ -8,7 +8,7 @@ if [ -z "${PHP_SHORT_VERSION:-}" ]; then
 fi
 
 if [ $(which docker || false) ]; then
-    readonly DOCKER_IMAGE_NAME="steevanb/php-typed-array-ci-php${PHP_SHORT_VERSION}:latest"
+    readonly DOCKER_IMAGE_NAME="steevanb/php-backtrace-ci:php${PHP_SHORT_VERSION}"
 
     if [ -z "${ROOT_DIR:-}" ]; then
         echo "Variable ROOT_DIR should be defined."
