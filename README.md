@@ -7,7 +7,7 @@
 php-backtrace
 -------------
 
-Show nice equivalent to debug_backtrace(), with caller, code preview etc.
+Show nice equivalent to `debug_backtrace()`, with caller, code preview etc.
 
 Can be used in HTML, or with [symfony/console](https://github.com/symfony/console).
 
@@ -17,7 +17,7 @@ Installation
 ------------
 
 ```bash
-composer require-dev steevanb/php-backtrace ^2.0
+composer require-dev steevanb/php-backtrace ^2.1
 ```
 
 Configuration
