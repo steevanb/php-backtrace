@@ -1,6 +1,9 @@
 ### [2.1.0](../../compare/2.0.1...2.1.0) (2020-05-15)
 
 - Set `DebugBacktraceConsole::dump()` and `DebugBacktraceConsole::eDump()` `$output` parameter facultative
+- Add PHP 8 compatibility
+- Add PHPUnit tests for PHP 5.4 to 8.0
+- Move files from root to src (it's not a BC break because you must use this classes with autoload)
 
 ### [2.0.1](../../compare/2.0.0...2.0.1) (2017-03-30)
 
@@ -26,7 +29,7 @@
 
 - Fix (Unknow call) when function is called
 - Add preview only when available
-- Show \Closure in File::Line column, instead of (Unknow file)::(Uknow line)
+- Show \Closure in File::Line column, instead of (Unknow file)::(Unknow line)
 
 ### 1.0.0 (2016-08-02)
 

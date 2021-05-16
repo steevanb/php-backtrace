@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+set -eu
+
+readonly rootDir="$(realpath $(dirname $(realpath $0))/..)"
+source "${rootDir}/bin/common.inc.sh"
+
+function buildDockerImage() {
+    local localPhpVersion="${1}"
+    local localDockerImageName="steevanb/php-typed-array-ci-php${localPhpVersion}:latest"
+    if [ ${refresh} == true ]; then
+        local localRefreshArguments="--no-cache"
+    else
+        local localRefreshArguments=
+    fi
+
+    title "Build Docker image ${localDockerImageName}"
+    DOCKER_BUILDKIT=1 \
+        docker \
+            build \
+                "${rootDir}/docker/php${localPhpVersion}" \
+                ${localRefreshArguments} \
+                --tag "${localDockerImageName}"
+}
+
+refresh=false
+for param in "$@"; do
+    if [ "${param}" == "--refresh" ]; then
+        refresh=true
+    fi
+done
+
+buildDockerImage "54"
+buildDockerImage "55"
+buildDockerImage "56"
+buildDockerImage "70"
+buildDockerImage "71"
+buildDockerImage "72"
+buildDockerImage "73"
+buildDockerImage "74"
+buildDockerImage "80"

@@ -71,7 +71,7 @@ class DebugBacktraceConsole extends \DebugBacktrace
     }
 
     /** @eturn OutputInterface */
-    protected static function getOutput(OutputInterface $output)
+    protected static function getOutput(OutputInterface $output = null)
     {
         return $output instanceof OutputInterface ? $output : new ConsoleOutput();
     }
