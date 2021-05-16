@@ -14,7 +14,12 @@
     "repositories": [
         {
             "type": "path",
-            "url": "/app"
+            "url": "/app",
+            "options": {
+                "versions": {
+                    "steevanb/php-backtrace": "dev-master"
+                }
+            }
         }
     ]
 }
