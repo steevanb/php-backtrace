@@ -4,9 +4,21 @@
     "type": "library",
     "description": "Nice debug_backtrace() dump, with call and code preview",
     "autoload": {
-        "files": ["DebugBacktrace.php", "DebugBacktraceHtml.php", "DebugBacktraceConsole.php"]
+        "files": ["src/DebugBacktrace.php", "src/DebugBacktraceHtml.php", "src/DebugBacktraceConsole.php"]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Steevanb\\PhpBacktrace\\Tests\\": "tests"
+        }
     },
     "require": {
       "php": "^5.4|^7.0|^8.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "4.8.*",
+        "symfony/console": "2.8.*"
+    },
+    "config": {
+        "sort-packages": true
     }
 }

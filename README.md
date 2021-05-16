@@ -37,23 +37,23 @@ Dump as HTML
 
 ```php
 // get backtrace dump as array
-\DebugBacktraceHtml::getBacktraces($offset = 0, $limit = null);
+\DebugBacktraceHtml::getBacktraces();
 // get backtrace dump as HTML
-\DebugBacktraceHtml::getDump($offset = 0, $limit = null);
+\DebugBacktraceHtml::getDump();
 // write getDump() HTML with echo
-\DebugBacktraceHtml::dump($offset = 0, $limit = null);
+\DebugBacktraceHtml::dump();
 // write getDump() HTML with echo, and exit
-\DebugBacktraceHtml::eDump($offset = 0, $limit = null);
+\DebugBacktraceHtml::eDump();
 ```
-![HTML backtrace](backtrace_html.png)
+![HTML backtrace](resources/backtrace_html.png)
 
 Dump in symfony/console application
 -----------------------------------
 
 ```php
-// write dump in $output
-\DebugBacktraceConsole::dump(OutputInterface $output, $offset = 0, $limit = null);
-// write dump in $output, and exit
-\DebugBacktraceConsole::eDump(OutputInterface $output, $offset = 0, $limit = null);
+// Write dump
+\DebugBacktraceConsole::dump();
+// Write dump and exit
+\DebugBacktraceConsole::eDump();
 ```
-![Console backtrace](backtrace_console.jpg)
+![Console backtrace](resources/backtrace_console.jpg)

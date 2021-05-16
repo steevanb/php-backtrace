@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+
+readonly rootDir="$(realpath $(dirname $(realpath $0))/../..)"
+source "${rootDir}/bin/common.inc.sh"
+
+function outputState() {
+    local rewrite="${1}"
+    local message="$(stateMessage ${phpunitPhp54State} 'PHP 5.4')"
+    message="${message}\n$(stateMessage ${phpunitPhp55State} 'PHP 5.5')"
+    message="${message}\n$(stateMessage ${phpunitPhp56State} 'PHP 5.6')"
+    message="${message}\n$(stateMessage ${phpunitPhp70State} 'PHP 7.0')"
+    message="${message}\n$(stateMessage ${phpunitPhp71State} 'PHP 7.1')"
+    message="${message}\n$(stateMessage ${phpunitPhp72State} 'PHP 7.2')"
+    message="${message}\n$(stateMessage ${phpunitPhp73State} 'PHP 7.3')"
+    message="${message}\n$(stateMessage ${phpunitPhp74State} 'PHP 7.4')"
+    message="${message}\n$(stateMessage ${phpunitPhp80State} 'PHP 8.0')"
+
+    if [ ${rewrite} == true ]; then
+        printf "\e[9A\e[K${message}\n"
+    else
+        printf "${message}\n"
+    fi
+}
+
+function stateMessage() {
+    local state="${1}"
+    local tool="${2}"
+
+    printf "\e[${state}m > \e[0m ${tool}"
+}
+
+readonly STATE_RUNNING="45"
+readonly STATE_ERROR="41"
+readonly STATE_TERMINATED="42"
+
+phpunitPhp54State=${STATE_RUNNING}
+phpunitPhp55State=${STATE_RUNNING}
+phpunitPhp56State=${STATE_RUNNING}
+phpunitPhp70State=${STATE_RUNNING}
+phpunitPhp71State=${STATE_RUNNING}
+phpunitPhp72State=${STATE_RUNNING}
+phpunitPhp73State=${STATE_RUNNING}
+phpunitPhp74State=${STATE_RUNNING}
+phpunitPhp80State=${STATE_RUNNING}
+
+outputState false
+
+${rootDir}/bin/ci/phpunitPhp54 > /dev/null 2>&1 &
+phpunitPhp54ProcessId=$!
+
+${rootDir}/bin/ci/phpunitPhp55 > /dev/null 2>&1 &
+phpunitPhp55ProcessId=$!
+
+${rootDir}/bin/ci/phpunitPhp56 > /dev/null 2>&1 &
+phpunitPhp56ProcessId=$!
+
+${rootDir}/bin/ci/phpunitPhp70 > /dev/null 2>&1 &
+phpunitPhp70ProcessId=$!
+
+${rootDir}/bin/ci/phpunitPhp71 > /dev/null 2>&1 &
+phpunitPhp71ProcessId=$!
+
+${rootDir}/bin/ci/phpunitPhp72 > /dev/null 2>&1 &
+phpunitPhp72ProcessId=$!
+
+${rootDir}/bin/ci/phpunitPhp73 > /dev/null 2>&1 &
+phpunitPhp73ProcessId=$!
+
+${rootDir}/bin/ci/phpunitPhp74 > /dev/null 2>&1 &
+phpunitPhp74ProcessId=$!
+
+${rootDir}/bin/ci/phpunitPhp80 > /dev/null 2>&1 &
+phpunitPhp80ProcessId=$!
+
+# L'ordre des wait est juste là pour qu'on affiche les flèches en vert le plus tôt possible
+# L'idée est de les mettre dans l'ordre de l'outil le plus rapide au plus lent
+# bien laisser ";" et pas "&&" pour que les erreurs soient bien trapées
+wait "${phpunitPhp54ProcessId}" ; if [ $? == "0" ]; then phpunitPhp54State=${STATE_TERMINATED}; else phpunitPhp54State=${STATE_ERROR}; fi ; outputState true
+wait "${phpunitPhp55ProcessId}" ; if [ $? == "0" ]; then phpunitPhp55State=${STATE_TERMINATED}; else phpunitPhp55State=${STATE_ERROR}; fi ; outputState true
+wait "${phpunitPhp56ProcessId}" ; if [ $? == "0" ]; then phpunitPhp56State=${STATE_TERMINATED}; else phpunitPhp56State=${STATE_ERROR}; fi ; outputState true
+wait "${phpunitPhp70ProcessId}" ; if [ $? == "0" ]; then phpunitPhp70State=${STATE_TERMINATED}; else phpunitPhp70State=${STATE_ERROR}; fi ; outputState true
+wait "${phpunitPhp71ProcessId}" ; if [ $? == "0" ]; then phpunitPhp71State=${STATE_TERMINATED}; else phpunitPhp71State=${STATE_ERROR}; fi ; outputState true
+wait "${phpunitPhp72ProcessId}" ; if [ $? == "0" ]; then phpunitPhp72State=${STATE_TERMINATED}; else phpunitPhp72State=${STATE_ERROR}; fi ; outputState true
+wait "${phpunitPhp73ProcessId}" ; if [ $? == "0" ]; then phpunitPhp73State=${STATE_TERMINATED}; else phpunitPhp73State=${STATE_ERROR}; fi ; outputState true
+wait "${phpunitPhp74ProcessId}" ; if [ $? == "0" ]; then phpunitPhp74State=${STATE_TERMINATED}; else phpunitPhp74State=${STATE_ERROR}; fi ; outputState true
+wait "${phpunitPhp80ProcessId}" ; if [ $? == "0" ]; then phpunitPhp80State=${STATE_TERMINATED}; else phpunitPhp80State=${STATE_ERROR}; fi ; outputState true

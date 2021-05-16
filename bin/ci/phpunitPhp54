@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+
+set -eu
+
+readonly ROOT_DIR="$(realpath $(dirname $(realpath $0))/../..)"
+
+readonly PHP_SHORT_VERSION="54"
+. ${ROOT_DIR}/bin/ci/phpunit.inc.sh
