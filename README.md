@@ -17,7 +17,7 @@ Installation
 ------------
 
 ```bash
-composer require-dev steevanb/php-backtrace ^2.1
+composer require --dev steevanb/php-backtrace ^2.1
 ```
 
 Configuration
