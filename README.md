@@ -1,8 +1,7 @@
-[![version](https://img.shields.io/badge/version-2.0.1-green.svg)](https://github.com/steevanb/php-backtrace/tree/2.0.1)
-[![php](https://img.shields.io/badge/php-^5.4%20||%20^7.0-blue.svg)](http://php.net)
-![Lines](https://img.shields.io/badge/code%20lines-519-green.svg)
+[![version](https://img.shields.io/badge/version-2.1.0-green.svg)](https://github.com/steevanb/php-backtrace/tree/2.1.0)
+[![php](https://img.shields.io/badge/php-^5.4%20||%20^7.0||%20^8.0-blue.svg)](http://php.net)
+![Lines](https://img.shields.io/badge/code%20lines-1463-green.svg)
 ![Total Downloads](https://poser.pugx.org/steevanb/php-backtrace/downloads)
-[![SensionLabsInsight](https://img.shields.io/badge/SensionLabsInsight-platinum-brightgreen.svg)](https://insight.sensiolabs.com/projects/2b6dd6a0-ef48-4b5b-ba13-e825e0841be3/analyses/15)
 [![Scrutinizer](https://scrutinizer-ci.com/g/steevanb/php-backtrace/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/steevanb/php-backtrace/)
 
 php-backtrace
